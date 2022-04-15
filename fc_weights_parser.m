@@ -4,32 +4,28 @@ function fc_weights_parser(num)
 
     fid = fopen(myfile) ; % opens file
 
-    header = fopen('fc_weights_0.h','w'); % make more dynamic
+    header = fopen('fc_weights_9.h','w'); % make more dynamic
     
     
-
-    while ~feof(fid)
-        
-        w = fread (fid, [5 5], 'uint16' );
-        fprintf(header,'fc_weight_data_%i[5][5] = {', num);
-        w = w';
+    for j = 1 : 32
+        while ~feof(fid)
+            w = fread (fid, [14 14], 'int16' );
+            fprintf(header,'fc_weight_data_%i_%i[14][14] = {', num, j);
+            w = w';
     
-        for i = 1 : numel(w)
-            if i == numel(w)
-                int_part = bitshift(w(i),8);
-                frac_part = w(i) & 0xFF;
-                result = int_part + frac_part/256.0;
-                fprintf(header, '%d', result);
-            else
-                int_part = bitshift(w(i),8);
-                frac_part = w(i) & 0xFF;
-                result = int_part + frac_part/256.0;
-                fprintf(header, '%d,', result);
+            for i = 1 : numel(w)
+                if i == numel(w)
+                    result = w(i)/256.0;
+                    fprintf(header, '%d', result);
+                else
+                    result = w(i)/256.0;
+                    fprintf(header, '%d,', result);
+                end
             end
+            fprintf(header, '}');
+            fprintf(header, '\n'); 
+            break;
         end
-        fprintf(header, '}');
-        fprintf(header, '\n'); 
-        break;
     end
 
     fclose(fid);
